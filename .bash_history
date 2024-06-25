@@ -1,0 +1,2 @@
+ls
+exec zsh
