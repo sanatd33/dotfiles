@@ -1,3 +1,4 @@
+#zmodload zsh/zprof
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -39,6 +40,12 @@ zinit cdreplay -q
 bindkey '^f' autosuggest-accept
 bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
+bindkey '^H' backward-kill-word
+bindkey "^[[1;5D" backward-word
+bindkey "^[[1;5C" forward-word
+bindkey "^[[3~" delete-char
+bindkey "^[[3;5~" kill-word
+
 
 # History
 HISTSIZE=5000
@@ -64,45 +71,33 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 alias cls="clear"
 alias ls="ls --color"
 alias n="start notepad++"
-alias python="py"
 alias spot="cd spot && python main.py"
+alias hw="cd ~/Documents/Homework && ./homework"
 
 # Shell Commands
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
 
-# NVM
-load-nvm() {
-    export NVM_DIR=~/.nvm
-    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+export PYTHONIOENCODING=utf8
+eval "$('/c/Users/Sanat/miniconda3/Scripts/conda.exe' 'shell.zsh' 'hook' | sed -e 's/"$CONDA_EXE" $_CE_M $_CE_CONDA "$@"/"$CONDA_EXE" $_CE_M $_CE_CONDA "$@" | tr -d \x27\\r\x27/g')"
+# <<< conda initialize <<<
+
+autoload -Uz compinit
+for dump in ~/.zcompdump(N.mh+24); do
+  compinit
+done
+compinit -C
+
+unix_to_win() {
+    local unix_path="$1"
+    echo "$unix_path" | sed -E 's|^/([a-zA-Z])/|\U\1:/|'
 }
 
-nvm() {
-    unset -f nvm
-    load-nvm
-    nvm "$@"
+keep_current_path() {
+  printf "\e]9;9;%s\e\\" "$(unix_to_win "$PWD")"
 }
+precmd_functions+=(keep_current_path)
 
-node() {
-    unset -f node
-    load-nvm
-    node "$@"
-}
-
-npm() {
-    unset -f npm
-    load-nvm
-    npm "$@"
-}
-
-pnpm() {
-    unset -f pnpm
-    load-nvm
-    pnpm "$@"
-}
-
-yarn() {
-    unset -f yarn
-    load-nvm
-    yarn "$@"
-}
+#zprof
